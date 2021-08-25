@@ -1,0 +1,25 @@
+[package]
+name = "static_media_server"
+version = "0.1.0"
+edition = "2018"
+description = "Serve static media files."
+license = "MIT"
+
+[dependencies]
+actix-web = "3"
+env_logger = "0.9.0"
+# env-logger should only be for the binary https://github.com/rust-lang/cargo/issues/1982
+log = "0.4.14"
+handlebars = "4.1.2"
+glob = "0.3.0"
+lazy_static = "1.4.0"
+serde = "1.0.128"
+serde_json = "1.0.66"
+async-trait = "0.1.51"
+mime = "0.3.16"
+urlencoding = "2.1.0"
+
+[dependencies.clap]
+version = "^3.0.0-beta.4"
+default-features = false
+features = ["std", "suggestions", "color", "wrap_help", "yaml"]
