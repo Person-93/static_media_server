@@ -1,4 +1,5 @@
 use super::super::templating::{self, Directory, Templates};
+use super::PathWithPrefix;
 use super::ResponderError;
 use super::{Responder, ResponderResult};
 use actix_web::HttpResponse;
@@ -21,10 +22,20 @@ impl<'a> DirectoryResponder<'a> {
     }
 }
 
+impl<'a> PathWithPrefix for DirectoryResponder<'a> {
+    fn get_path(&self) -> &Path {
+        self.path
+    }
+
+    fn get_path_prefix(&self) -> &Path {
+        self.path_prefix
+    }
+}
+
 #[async_trait(?Send)]
 impl<'a> Responder for DirectoryResponder<'a> {
     async fn respond(&self) -> ResponderResult<HttpResponse> {
-        let path_with_glob = self.path_prefix.join("*");
+        let path_with_glob = self.prefixed_path().join("*");
         let pattern = path_with_glob.to_str().ok_or_else(|| {
             ResponderError::new(RESPONDER_NAME, "Error glob string")
         })?;
