@@ -4,6 +4,7 @@ use super::ResponderError;
 use super::{Responder, ResponderResult};
 use actix_web::HttpResponse;
 use async_trait::async_trait;
+use glob::Pattern;
 use std::path::{Path, PathBuf};
 
 pub struct DirectoryResponder<'a> {
@@ -35,11 +36,15 @@ impl<'a> PathWithPrefix for DirectoryResponder<'a> {
 #[async_trait(?Send)]
 impl<'a> Responder for DirectoryResponder<'a> {
     async fn respond(&self) -> ResponderResult<HttpResponse> {
-        let path_with_glob = self.prefixed_path().join("*");
-        let pattern = path_with_glob.to_str().ok_or_else(|| {
-            ResponderError::new(RESPONDER_NAME, "Error glob string")
+        let prefixed_path = self.prefixed_path();
+        let prefixed_path = prefixed_path.to_str().ok_or_else(|| {
+            ResponderError::new(
+                RESPONDER_NAME,
+                "Prefixed path is not a valid UTF-8 string",
+            )
         })?;
-        let files = glob::glob(pattern)
+        let pattern = Pattern::escape(prefixed_path) + "/*";
+        let files = glob::glob(&pattern)
             .map_err(|e| {
                 ResponderError::new(RESPONDER_NAME, "Error creating glob")
                     .with_error(Box::new(e))
