@@ -9,6 +9,7 @@ use log::info;
 use std::error;
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
+use std::path::{Path, PathBuf};
 
 pub use dispatcher::Dispatcher;
 
@@ -89,5 +90,15 @@ impl Error for ResponderError {
 
     fn description(&self) -> &str {
         self.message
+    }
+}
+
+pub trait PathWithPrefix {
+    fn get_path(&self) -> &Path;
+    fn get_path_prefix(&self) -> &Path;
+    fn prefixed_path(&self) -> PathBuf {
+        let path = self.get_path();
+        let path = path.strip_prefix("/").unwrap_or(path);
+        self.get_path_prefix().join(path)
     }
 }

@@ -1,11 +1,12 @@
 use super::directory::DirectoryResponder;
 use super::not_found::NotFoundResponder;
 use super::unimplemented::UnimplementedResponder;
+use super::PathWithPrefix;
 use super::{Responder, ResponderError, ResponderResult};
 use actix_web::HttpResponse;
 use async_trait::async_trait;
 use std::error::Error;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 pub struct Dispatcher<'a> {
     path: &'a Path,
@@ -38,10 +39,15 @@ impl<'a> Dispatcher<'a> {
         Ok(HttpResponse::InternalServerError()
             .body(format!("Unknown error: {}", err)))
     }
+}
 
-    fn prefixed_path(&self) -> PathBuf {
-        let path = self.path.strip_prefix("/").unwrap_or(self.path);
-        self.prefix_path.join(path)
+impl<'a> PathWithPrefix for Dispatcher<'a> {
+    fn get_path(&self) -> &Path {
+        self.path
+    }
+
+    fn get_path_prefix(&self) -> &Path {
+        self.prefix_path
     }
 }
 
