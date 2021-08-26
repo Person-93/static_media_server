@@ -1,0 +1,12 @@
+name: "dummy name"
+settings:
+  - ColoredHelp
+args:
+  - ip:
+      about: the ip address and port number to bind to
+      index: 1
+      required: true
+  - dir:
+      about: directory where files will be served from
+      index: 2
+      required: false
