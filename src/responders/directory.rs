@@ -40,15 +40,17 @@ impl<'a> Responder for DirectoryResponder<'a> {
             ResponderError::new(RESPONDER_NAME, "Error glob string")
         })?;
         let files = glob::glob(pattern)
-            .map_err(|_| {
+            .map_err(|e| {
                 ResponderError::new(RESPONDER_NAME, "Error creating glob")
+                    .with_error(Box::new(e))
             })?
             .collect::<Result<Vec<PathBuf>, _>>()
-            .map_err(|_| {
+            .map_err(|e| {
                 ResponderError::new(
                     RESPONDER_NAME,
                     "Pattern error while getting files",
                 )
+                .with_error(Box::new(e))
             })?;
         let files = files
             .iter()

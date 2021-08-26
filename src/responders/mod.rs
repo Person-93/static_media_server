@@ -32,7 +32,7 @@ pub trait Responder: Sync + Send {
     #[allow(clippy::async_yields_async)]
     async fn error_map(&self, err: ResponderError) -> HttpResponse {
         HttpResponse::InternalServerError()
-            .body(format!("An error occurred\n{}", err))
+            .body(format!("An error occurred: {}", err))
     }
 }
 

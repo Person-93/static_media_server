@@ -96,5 +96,5 @@ impl<'a> Responder for Dispatcher<'a> {
 
 fn generic_error_response(err: &dyn Error) -> HttpResponse {
     HttpResponse::InternalServerError()
-        .body(format!("Error dispatching request {}", err))
+        .body(format!("Error dispatching request: {}", err))
 }
