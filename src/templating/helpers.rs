@@ -28,26 +28,33 @@ fn file_entry(
                 "First param to `file_entry` must be the path as an array",
             )
         })?[1..];
-    let mut path = values_as_str(path)
-        .map_err(RenderError::new)?
-        .iter()
-        .map(|segment| urlencoding::encode(segment).into_owned())
-        .collect::<Vec<_>>();
 
     let file = helper
         .param(1)
-        .and_then(|v| v.value().as_str())
         .ok_or_else(|| {
             RenderError::new(
             "Second param to `file_entry` must be the file name as a string",
         )
+        })?
+        .value()
+        .as_str()
+        .ok_or_else(|| {
+            RenderError::new("File name is not a valid UTF-8 string")
         })?;
 
-    path.push(urlencoding::encode(file).into_owned());
-    let path: PathBuf = path.iter().collect();
-    let path = path.to_str().ok_or_else(|| {
-        RenderError::new("Path in `file_entry` is not valid utf-8 string")
-    })?;
+    let path = path.iter().last().map(|v| v.to_string());
+    let path = match path {
+        Some(parent) => {
+            // remove quotes added by Value::tostring()
+            let mut parent = parent.chars();
+            parent.next();
+            parent.next_back();
+            let parent = parent.as_str();
+
+            format!("{}/{}", parent, file)
+        }
+        None => file.to_owned(),
+    };
 
     out.write(&format!("<a href=\"{}\">{}</a><br/>", path, file))?;
 
